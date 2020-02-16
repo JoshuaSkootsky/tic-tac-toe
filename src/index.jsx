@@ -2,15 +2,39 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-class Square extends React.Component {
-  render() {
-    return <button className="square">{/* TODO */}</button>;
-  }
-}
+//component number one.
 
+// Replace this.state.value with this.props.value in Square’s render method
+// Replace this.setState() with this.props.onClick() in Square’s render method
+// Delete the constructor from Square because Square no longer keeps track of the game’s state
+const Square = props => (
+  <button className="square" onClick={props.onClick}>
+    {props.value}
+  </button>
+);
+
+// component #2
 class Board extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      squares: Array(9).fill(' '),
+    };
+  }
+
+  handleClick(i) {
+    const squares = [...this.state.squares]; // copy
+    squares[i] = 'X';
+    this.setState({ squares });
+  }
+
   renderSquare(i) {
-    return <Square />;
+    return (
+      <Square
+        value={this.state.squares[i]}
+        onClick={() => this.handleClick(i)}
+      />
+    );
   }
 
   render() {
@@ -39,6 +63,7 @@ class Board extends React.Component {
   }
 }
 
+// component #3
 class Game extends React.Component {
   render() {
     return (
