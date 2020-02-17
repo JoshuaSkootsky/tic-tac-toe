@@ -1,14 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import { calculateWinner } from './utils';
 
 //component number one.
 
 // Replace this.state.value with this.props.value in Square’s render method
 // Replace this.setState() with this.props.onClick() in Square’s render method
 // Delete the constructor from Square because Square no longer keeps track of the game’s state
-const Square = ({ value, onClick }) => (
+const Square = ({ onClick, value }) => (
   <button className="square" onClick={onClick}>
     {value}
   </button>
@@ -25,15 +24,9 @@ class Board extends React.Component {
   }
 
   handleClick(i) {
-    const squares = [...this.state.squares];
-    if (squares[i] || calculateWinner(squares)) {
-      return;
-    }
-    squares[i] = this.state.XisNext ? 'X' : 'O'; // immutable, change a copy
-    this.setState({
-      squares,
-      XisNext: !this.state.XisNext,
-    });
+    const squares = [...this.state.squares]; // copy
+    squares[i] = this.state.XisNext ? 'X' : 'O';
+    this.setState({ squares, XisNext: !this.state.XisNext });
   }
 
   renderSquare(i) {
@@ -46,13 +39,7 @@ class Board extends React.Component {
   }
 
   render() {
-    const winner = calculateWinner(this.state.squares);
-    let status;
-    if (winner) {
-      status = 'Winner: ' + winner;
-    } else {
-      status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
-    }
+    const status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
 
     return (
       <div>
