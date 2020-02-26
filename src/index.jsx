@@ -61,12 +61,11 @@ class Game extends React.Component {
       return // do nothing on this click
     }
     squares[i] = this.state.XisNext ? 'X' : 'O'
-    // add to history
-    // TODO refactor this .concat([ { squares }])
+
     this.setState({
       history: history.concat([
         {
-          squares: squares,
+          squares,
         },
       ]),
       stepNumber: history.length,
