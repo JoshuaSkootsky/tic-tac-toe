@@ -39,7 +39,68 @@ const Board = props => {
 }
 
 // component #3 - refactor with State Hooks
-// start by putting stepNumber in a state hook
+const Game = props => {
+  // need history, state, and XisNext state
+  // instead of constructor, initialize hooks
+  const [stepNumber, setStepNumber] = useState(0)
+  const [history, setHistory] = useState([{ squares: [] }])
+  const [XisNext, setXisNext] = useState(true)
+
+  const handleClick = i => {
+    setHistory(history.slice(0, stepNumber + 1))
+
+    const current = history[history.length - 1] // get current squares
+    const squares = [...current.squares] // make a safe copy
+    if (calculateWinner(squares) || squares[i]) {
+      return // do nothing on this click
+    }
+    // update squares copy with current move
+    squares[i] = XisNext ? 'X' : 'O'
+    // update history
+    setHistory(history.concat([{ squares }]))
+    setStepNumber(history.length)
+    setXisNext(!XisNext)
+  }
+
+  const jumpTo = step => {
+    setStepNumber(step)
+    setXisNext(step % 2 === 0)
+  }
+  // this move list will be displayed later
+  const moves = history.map((step, move) => {
+    // move variable is the move #, i.e. move #2, #3, ...
+    // it is the index of the map
+    const desc = move ? 'Go to move #' + move : 'Go to game start'
+    return (
+      <li key={move}>
+        <button onClick={() => jumpTo(move)}>{desc}</button>
+      </li>
+    )
+  })
+
+  const current = history[stepNumber]
+  const winner = calculateWinner(current.squares)
+
+  let status
+  if (winner) {
+    status = 'Winner: ' + winner
+  } else {
+    status = 'Next player: ' + (XisNext ? 'X' : 'O')
+  }
+  // display
+  return (
+    <div className="game">
+      <div className="game-board">
+        <Board squares={current.squares} onClick={i => handleClick(i)} />
+      </div>
+      <div className="game-info">
+        <div>{status}</div>
+        <ol>{moves}</ol>
+      </div>
+    </div>
+  )
+}
+/*
 class Game extends React.Component {
   constructor(props) {
     super(props)
@@ -114,6 +175,7 @@ class Game extends React.Component {
     )
   }
 }
+*/
 
 // ========================================
 
