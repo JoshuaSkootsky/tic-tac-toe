@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 import './index.css'
 import { calculateWinner } from './utils'
@@ -39,6 +39,7 @@ const Board = props => {
 }
 
 // component #3 - refactor with State Hooks
+// start by putting stepNumber in a state hook
 class Game extends React.Component {
   constructor(props) {
     super(props)
@@ -61,13 +62,9 @@ class Game extends React.Component {
       return // do nothing on this click
     }
     squares[i] = this.state.XisNext ? 'X' : 'O'
-
+    // add a new squares object
     this.setState({
-      history: history.concat([
-        {
-          squares,
-        },
-      ]),
+      history: history.concat([{ squares }]),
       stepNumber: history.length,
       XisNext: !this.state.XisNext, // change X state
     })
