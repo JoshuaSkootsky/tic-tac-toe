@@ -15,7 +15,10 @@ Features todo:
 */
 //component number one - an individual square
 
-type SquareProps = { onClick: any; value: string }
+type SquareProps = {
+  onClick(): void
+  value: string
+}
 const Square = ({ onClick, value }: SquareProps) => (
   <button className="square" onClick={onClick}>
     {value}
@@ -23,7 +26,10 @@ const Square = ({ onClick, value }: SquareProps) => (
 )
 
 // component #2
-type BoardProps = { onClick: any; squares: string[] }
+type BoardProps = {
+  onClick(i: number): void
+  squares: string[]
+}
 const Board = ({ onClick, squares }: BoardProps) => {
   // render square utility function
   const renderSquare = (i: number) => {
