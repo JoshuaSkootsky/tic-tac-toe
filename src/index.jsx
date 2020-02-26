@@ -11,7 +11,6 @@ const Square = ({ onClick, value }) => (
 )
 
 // component #2
-// TODO refactor this as a functional component
 const Board = props => {
   // render square utility function
   function renderSquare(i) {
@@ -46,7 +45,7 @@ class Game extends React.Component {
     this.state = {
       history: [
         {
-          squares: Array(9).fill(null),
+          squares: [],
         },
       ],
       stepNumber: 0,
