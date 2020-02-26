@@ -13,7 +13,7 @@ const Square = ({ onClick, value }) => (
 // component #2
 const Board = props => {
   // render square utility function
-  function renderSquare(i) {
+  const renderSquare = i => {
     return <Square value={props.squares[i]} onClick={() => props.onClick(i)} />
   }
 
@@ -38,7 +38,7 @@ const Board = props => {
   )
 }
 
-// component #3
+// component #3 - refactor with State Hooks
 class Game extends React.Component {
   constructor(props) {
     super(props)
