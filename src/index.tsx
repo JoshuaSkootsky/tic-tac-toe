@@ -3,18 +3,31 @@ import ReactDOM from 'react-dom'
 import './index.css'
 import { calculateWinner } from './utils'
 
+/*
+Features todo:
+
+- Type everything with typescript
+
+- Bold the currently selected item in the move list.
+- Sort moves desc or ascending order
+- When someone wins, highlight the three squares that caused the win.
+- When no one wins, display a message about the result being a draw.
+*/
 //component number one - an individual square
-const Square = ({ onClick, value }) => (
+
+type SquareProps = { onClick: any; value: string }
+const Square = ({ onClick, value }: SquareProps) => (
   <button className="square" onClick={onClick}>
     {value}
   </button>
 )
 
 // component #2
-const Board = props => {
+type BoardProps = { onClick: any; squares: string[] }
+const Board = ({ onClick, squares }: BoardProps) => {
   // render square utility function
-  const renderSquare = i => {
-    return <Square value={props.squares[i]} onClick={() => props.onClick(i)} />
+  const renderSquare = (i: number) => {
+    return <Square value={squares[i]} onClick={() => onClick(i)} />
   }
 
   return (
@@ -42,10 +55,10 @@ const Board = props => {
 const Game = () => {
   // instead of constructor, initialize state hooks for history, state, and XisNext
   const [stepNumber, setStepNumber] = useState(0)
-  const [history, setHistory] = useState([{ squares: [] }])
+  const [history, setHistory] = useState([{ squares: Array(9) }])
   const [XisNext, setXisNext] = useState(true)
 
-  const handleClick = i => {
+  const handleClick = (i: number) => {
     setHistory(history.slice(0, stepNumber + 1))
 
     const current = history[history.length - 1] // get current squares
@@ -61,7 +74,7 @@ const Game = () => {
     setXisNext(!XisNext)
   }
 
-  const jumpTo = step => {
+  const jumpTo = (step: number) => {
     setStepNumber(step)
     setXisNext(step % 2 === 0)
   }
@@ -88,7 +101,10 @@ const Game = () => {
   return (
     <div className="game">
       <div className="game-board">
-        <Board squares={current.squares} onClick={i => handleClick(i)} />
+        <Board
+          squares={current.squares}
+          onClick={(i: number) => handleClick(i)}
+        />
       </div>
       <div className="game-info">
         <div>{status}</div>
