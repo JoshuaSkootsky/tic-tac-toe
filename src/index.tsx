@@ -5,7 +5,6 @@ import { calculateWinner } from './utils';
 
 /*
 Features todo:
-- Bold the currently selected item in the move list.
 - Sort moves desc or ascending order
 - When someone wins, highlight the three squares that caused the win.
 - When no one wins, display a message about the result being a draw.
@@ -57,8 +56,12 @@ const Board = ({ onClick, squares }: BoardProps) => {
 // component #3 - Game
 const Game = () => {
   // instead of constructor, initialize state hooks for history, state, and XisNext
+  // TODO: fix this bug
+  // make one move. Go back one move. Then make a 2nd move.
+  // Game proceeds from game state of first move. 0 -> 1 -> 2. You have now made two moves as X.
   const [stepNumber, setStepNumber] = useState(0);
-  const [history, setHistory] = useState([{ squares: Array(9) }]);
+  const squares: string[] = new Array(9).fill('');
+  const [history, setHistory] = useState([{ squares }]);
   const [XisNext, setXisNext] = useState(true);
 
   const handleClick = (i: number) => {
@@ -103,11 +106,13 @@ const Game = () => {
   const current = history[stepNumber];
   const winner = calculateWinner(current.squares);
 
-  let status: string;
+  let status = 'Next player: ' + (XisNext ? 'X' : 'O');
   if (winner) {
     status = 'Winner: ' + winner;
-  } else {
-    status = 'Next player: ' + (XisNext ? 'X' : 'O');
+  }
+
+  if (stepNumber === 9 && !winner) {
+    status = 'Tie game!';
   }
   // display
   return (
