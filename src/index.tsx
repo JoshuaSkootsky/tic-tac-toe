@@ -84,6 +84,15 @@ const Game = () => {
   // this move list will be displayed later
   const moves = history.map((e, i) => {
     const desc = i ? 'Go to move #' + i : 'Go to game start';
+    if (i === stepNumber) {
+      return (
+        <li key={i}>
+          <button onClick={() => jumpTo(i)}>
+            <strong>{desc}</strong>
+          </button>
+        </li>
+      );
+    }
     return (
       <li key={i}>
         <button onClick={() => jumpTo(i)}>{desc}</button>
@@ -94,7 +103,7 @@ const Game = () => {
   const current = history[stepNumber];
   const winner = calculateWinner(current.squares);
 
-  let status;
+  let status: string;
   if (winner) {
     status = 'Winner: ' + winner;
   } else {
