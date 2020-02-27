@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import { calculateWinner } from './utils';
@@ -59,15 +59,23 @@ const Game = () => {
   // TODO: fix this bug
   // make one move. Go back one move. Then make a 2nd move.
   // Game proceeds from game state of first move. 0 -> 1 -> 2. You have now made two moves as X.
+  // I can confirm that this bug exists
+  // bug was fixed by changing current = history[stepNumber]
+  // now the problem is that on time travel, you can't pick up an old game state
+  // from where you started without appending the new moves to the move list
+  // you end up with 14 move games
+  // this messes up the tie logic, and also isn't correct - move list should
+  // reset if you start playing from an old game state.
   const [stepNumber, setStepNumber] = useState(0);
-  const squares: string[] = new Array(9).fill('');
+  const squares: string[] = Array(9);
   const [history, setHistory] = useState([{ squares }]);
   const [XisNext, setXisNext] = useState(true);
 
   const handleClick = (i: number) => {
     setHistory(history.slice(0, stepNumber + 1));
+    console.log(`setHistory with length of stepNumber ${stepNumber}`);
 
-    const current = history[history.length - 1]; // get current squares
+    const current = history[stepNumber]; // get current squares
     const squares = [...current.squares]; // make a safe copy
     if (calculateWinner(squares) || squares[i]) {
       return; // do nothing on this click
@@ -75,14 +83,24 @@ const Game = () => {
     // update squares copy with current move
     squares[i] = XisNext ? 'X' : 'O';
     // update history
+    console.log(`About to update history ${history} with squares ${squares}`);
     setHistory(history.concat([{ squares }]));
-    setStepNumber(history.length);
+    console.log(`New history ${history}`);
+    setStepNumber(stepNumber + 1);
+    console.log(`New step number set: ${stepNumber}`);
     setXisNext(!XisNext);
   };
 
+  /*
+  Rule #1 of hooks - only call hooks at the top level
+  This must be changed
+  
+  */
   const jumpTo = (step: number) => {
     setStepNumber(step);
     setXisNext(step % 2 === 0);
+    console.log(`jumping to move number ${step}`);
+    console.log(`Step number set to ${stepNumber}`);
   };
   // this move list will be displayed later
   const moves = history.map((e, i) => {
@@ -110,7 +128,6 @@ const Game = () => {
   if (winner) {
     status = 'Winner: ' + winner;
   }
-
   if (stepNumber === 9 && !winner) {
     status = 'Tie game!';
   }
