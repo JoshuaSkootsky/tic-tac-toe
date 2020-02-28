@@ -55,17 +55,17 @@ const Board = ({ onClick, squares }: BoardProps) => {
 };
 
 // component #3 - Game
-interface P {
-  props?: Readonly<P>;
+interface GameP {
+  props?: Readonly<GameP>;
 }
 
-interface S {
+interface GameS {
   history: { squares: string[] }[];
   stepNumber: number;
   XisNext: boolean;
 }
-class Game extends React.Component<P, S> {
-  constructor(props: P) {
+class Game extends React.Component<GameP, GameS> {
+  constructor(props: GameP) {
     super(props);
     this.state = {
       history: [
@@ -76,7 +76,7 @@ class Game extends React.Component<P, S> {
       stepNumber: 0,
       XisNext: true,
     };
-
+    // jump will be called in the Moves display component
     this.jumpTo = this.jumpTo.bind(this);
   }
 
