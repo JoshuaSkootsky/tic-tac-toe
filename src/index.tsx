@@ -114,6 +114,17 @@ class Game extends React.Component<P, S> {
       // move variable is the move #, i.e. move #2, #3, ...
       // it is the index of the map
       const desc = move ? 'Go to move #' + move : 'Go to game start';
+
+      if (move === this.state.stepNumber) {
+        return (
+          <li key={move}>
+            <button onClick={() => this.jumpTo(move)}>
+              <strong> {desc} </strong>
+            </button>
+          </li>
+        );
+      }
+
       return (
         <li key={move}>
           <button onClick={() => this.jumpTo(move)}>{desc}</button>
