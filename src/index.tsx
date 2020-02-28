@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
+
 import './index.css';
 import { calculateWinner } from './utils';
+import Moves from './Moves';
 
 /*
 Features todo:
 - Sort moves desc or ascending order
 - When someone wins, highlight the three squares that caused the win.
-- When no one wins, display a message about the result being a draw.
 */
 
 type SquareProps = {
   onClick(): void;
   value: string;
 };
+
 const Square = ({ onClick, value }: SquareProps) => (
   <button className="square" onClick={onClick}>
     {value}
@@ -74,6 +76,8 @@ class Game extends React.Component<P, S> {
       stepNumber: 0,
       XisNext: true,
     };
+
+    this.jumpTo = this.jumpTo.bind(this);
   }
 
   handleClick(i: number) {
@@ -109,28 +113,6 @@ class Game extends React.Component<P, S> {
     const history = this.state?.history ?? [];
     const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
-    // this move list will be displayed later
-    const moves = history.map((step, move) => {
-      // move variable is the move #, i.e. move #2, #3, ...
-      // it is the index of the map
-      const desc = move ? 'Go to move #' + move : 'Go to game start';
-
-      if (move === this.state.stepNumber) {
-        return (
-          <li key={move}>
-            <button onClick={() => this.jumpTo(move)}>
-              <strong> {desc} </strong>
-            </button>
-          </li>
-        );
-      }
-
-      return (
-        <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
-        </li>
-      );
-    });
 
     let status = 'Next player: ' + (this.state.XisNext ? 'X' : 'O');
     if (winner) {
@@ -150,7 +132,11 @@ class Game extends React.Component<P, S> {
         </div>
         <div className="game-info">
           <div>{status}</div>
-          <ol>{moves}</ol>
+          <Moves
+            history={this.state.history}
+            stepNumber={this.state.stepNumber}
+            jumpTo={this.jumpTo}
+          />
         </div>
       </div>
     );
