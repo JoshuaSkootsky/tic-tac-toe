@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import { calculateWinner } from './utils';
@@ -9,7 +9,6 @@ Features todo:
 - When someone wins, highlight the three squares that caused the win.
 - When no one wins, display a message about the result being a draw.
 */
-//component number one - an individual square
 
 type SquareProps = {
   onClick(): void;
@@ -54,100 +53,97 @@ const Board = ({ onClick, squares }: BoardProps) => {
 };
 
 // component #3 - Game
-const Game = () => {
-  // instead of constructor, initialize state hooks for history, state, and XisNext
-  // TODO: fix this bug
-  // make one move. Go back one move. Then make a 2nd move.
-  // Game proceeds from game state of first move. 0 -> 1 -> 2. You have now made two moves as X.
-  // I can confirm that this bug exists
-  // bug was fixed by changing current = history[stepNumber]
-  // now the problem is that on time travel, you can't pick up an old game state
-  // from where you started without appending the new moves to the move list
-  // you end up with 14 move games
-  // this messes up the tie logic, and also isn't correct - move list should
-  // reset if you start playing from an old game state.
-  const [stepNumber, setStepNumber] = useState(0);
-  const squares: string[] = Array(9);
-  const [history, setHistory] = useState([{ squares }]);
-  const [XisNext, setXisNext] = useState(true);
+interface P {
+  props?: Readonly<P>;
+}
 
-  const handleClick = (i: number) => {
-    setHistory(history.slice(0, stepNumber + 1));
-    console.log(`setHistory with length of stepNumber ${stepNumber}`);
+interface S {
+  history: { squares: string[] }[];
+  stepNumber: number;
+  XisNext: boolean;
+}
+class Game extends React.Component<P, S> {
+  constructor(props: P) {
+    super(props);
+    this.state = {
+      history: [
+        {
+          squares: [],
+        },
+      ],
+      stepNumber: 0,
+      XisNext: true,
+    };
+  }
 
-    const current = history[stepNumber]; // get current squares
-    const squares = [...current.squares]; // make a safe copy
+  handleClick(i: number) {
+    const history =
+      this.state?.history?.slice(0, this.state.stepNumber + 1) ?? [];
+    const current = history[history.length - 1];
+    const squares = [...current.squares];
     if (calculateWinner(squares) || squares[i]) {
       return; // do nothing on this click
     }
-    // update squares copy with current move
-    squares[i] = XisNext ? 'X' : 'O';
-    // update history
-    console.log(`About to update history ${history} with squares ${squares}`);
-    setHistory(history.concat([{ squares }]));
-    console.log(`New history ${history}`);
-    setStepNumber(stepNumber + 1);
-    console.log(`New step number set: ${stepNumber}`);
-    setXisNext(!XisNext);
-  };
+    squares[i] = this.state.XisNext ? 'X' : 'O';
 
-  /*
-  Rule #1 of hooks - only call hooks at the top level
-  This must be changed
-  
-  */
-  const jumpTo = (step: number) => {
-    setStepNumber(step);
-    setXisNext(step % 2 === 0);
-    console.log(`jumping to move number ${step}`);
-    console.log(`Step number set to ${stepNumber}`);
-  };
-  // this move list will be displayed later
-  const moves = history.map((e, i) => {
-    const desc = i ? 'Go to move #' + i : 'Go to game start';
-    if (i === stepNumber) {
+    this.setState({
+      history: history.concat([
+        {
+          squares,
+        },
+      ]),
+      stepNumber: history.length,
+      XisNext: !this.state.XisNext, // change X state
+    });
+  }
+
+  jumpTo(stepNumber: number) {
+    this.setState({
+      stepNumber,
+      XisNext: stepNumber % 2 === 0,
+    });
+  }
+
+  render() {
+    // calculate
+    const history = this.state?.history ?? [];
+    const current = history[this.state.stepNumber];
+    const winner = calculateWinner(current.squares);
+    // this move list will be displayed later
+    const moves = history.map((step, move) => {
+      // move variable is the move #, i.e. move #2, #3, ...
+      // it is the index of the map
+      const desc = move ? 'Go to move #' + move : 'Go to game start';
       return (
-        <li key={i}>
-          <button onClick={() => jumpTo(i)}>
-            <strong>{desc}</strong>
-          </button>
+        <li key={move}>
+          <button onClick={() => this.jumpTo(move)}>{desc}</button>
         </li>
       );
+    });
+
+    let status;
+    if (winner) {
+      status = 'Winner: ' + winner;
+    } else {
+      status = 'Next player: ' + (this.state.XisNext ? 'X' : 'O');
     }
+    // display
     return (
-      <li key={i}>
-        <button onClick={() => jumpTo(i)}>{desc}</button>
-      </li>
+      <div className="game">
+        <div className="game-board">
+          <Board
+            squares={current.squares}
+            onClick={(i) => this.handleClick(i)}
+          />
+        </div>
+        <div className="game-info">
+          <div>{status}</div>
+          <ol>{moves}</ol>
+        </div>
+      </div>
     );
-  });
-
-  const current = history[stepNumber];
-  const winner = calculateWinner(current.squares);
-
-  let status = 'Next player: ' + (XisNext ? 'X' : 'O');
-  if (winner) {
-    status = 'Winner: ' + winner;
   }
-  if (stepNumber === 9 && !winner) {
-    status = 'Tie game!';
-  }
-  // display
-  return (
-    <div className="game">
-      <div className="game-board">
-        <Board
-          squares={current.squares}
-          onClick={(i: number) => handleClick(i)}
-        />
-      </div>
-      <div className="game-info">
-        <div>{status}</div>
-        <ol>{moves}</ol>
-      </div>
-    </div>
-  );
-};
-
+}
 // ========================================
 
 ReactDOM.render(<Game />, document.getElementById('root'));
